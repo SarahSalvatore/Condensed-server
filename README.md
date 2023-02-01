@@ -6,7 +6,7 @@
 
 ## Live Demo
 
-Find the live demo here: [www.hereistheurl.com](www.hereistheurl.com)
+Find the live demo here: [https://condensed.netlify.app/](https://condensed.netlify.app/)
 
 ## Introduction
 
