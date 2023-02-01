@@ -22,6 +22,13 @@ app = express();
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Add Access Control Allow Origin headers
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://condensed.netlify.app");
+  res.header("Access-Control-Allow-Headers");
+  next();
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
