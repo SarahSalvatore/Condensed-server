@@ -70,10 +70,7 @@ app.post("/condense", async (req, res, next) => {
         return res.json({ newUrl: `${process.env.URL}/${url.slug}` });
       } else {
         let slug = nanoid();
-        // if the slug generated already exists in the db, generate a new slug. Repeat until condition is false.
-        while (checkIfSlugExists(slug)) {
-          slug = nanoid();
-        }
+
         // if the slug is unique and not in the db, create a new entry
         if (!checkIfSlugExists(slug)) {
           let createdUrl = await URL.create({
@@ -84,6 +81,10 @@ app.post("/condense", async (req, res, next) => {
             created: createdUrl,
             newUrl: `${process.env.URL}/${createdUrl.slug}`,
             status: response.status,
+          });
+        } else {
+          return res.status.json({
+            message: "Slug already exists. Please try again.",
           });
         }
       }
