@@ -13,6 +13,7 @@ const corsOptions = {
   // access control allow credentials header
   credentials: true,
   optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
 };
 
 module.exports = corsOptions;
