@@ -52,31 +52,32 @@ app.get("/urls", async (req, res, next) => {
 });
 
 app.post("/condense", async (req, res, next) => {
-  // If there is a url in the req.body, execute findOne, else return an error that a URL is required
-  if (req.body.url) {
+  let { url } = req.body;
+  // if the url received ends with /, remove the slash to avoid duplicates with and without a slash
+  if (url) {
+    url.endsWith("/") ? (url = url.slice(0, url.length - 1)) : url;
+    // If there is a url in the req.body, execute findOne, else return an error that a URL is required
     try {
-      let url = await URL.findOne({ originalUrl: req.body.url }).lean().exec();
+      let existingUrl = await URL.findOne({ originalUrl: url }).lean().exec();
       // if a url already exists in db, send existing url, else create slug
-      if (url) {
-        return res.json({ newUrl: `${process.env.URL}/${url.slug}` });
+      if (existingUrl) {
+        return res.json({ newUrl: `${process.env.URL}/${existingUrl.slug}` });
       } else {
         let slug = nanoid();
         let existingSlug = await URL.findOne({ slug: slug }).lean().exec();
-
+        // if the slug generated already exists, generate a new slug until it is unique
+        while (existingSlug) {
+          slug = nanoid();
+          existingSlug = await URL.findOne({ slug: slug }).lean().exec();
+        }
         // if the slug is unique and not in the db, create a new entry
         if (!existingSlug) {
           let createdUrl = await URL.create({
-            originalUrl: req.body.url,
+            originalUrl: url,
             slug: slug,
           });
           return res.json({
-            created: createdUrl,
             newUrl: `${process.env.URL}/${createdUrl.slug}`,
-            status: response.status,
-          });
-        } else {
-          return res.status.json({
-            message: "Slug already exists. Please try again.",
           });
         }
       }
